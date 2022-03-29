@@ -1,4 +1,5 @@
 import { Fragment, useState } from 'react';
+import { useSession, signOut } from 'next-auth/react';
 import { useRouter } from 'next/router';
 import Head from 'next/head';
 import Link from 'next/link';
@@ -35,17 +36,18 @@ const menuItems = [
   {
     label: 'Logout',
     icon: LogoutIcon,
-    onClick: () => null,
+    onClick: signOut,
   },
 ];
 
 const Layout = ({ children = null }) => {
+  const { data: session, status } = useSession();
+  const user = session?.user;
+  const isLoadingUser = status === 'loading';
+
   const router = useRouter();
 
   const [showModal, setShowModal] = useState(false);
-
-  const user = null;
-  const isLoadingUser = false;
 
   const openModal = () => setShowModal(true);
   const closeModal = () => setShowModal(false);
@@ -76,7 +78,7 @@ const Layout = ({ children = null }) => {
               <div className="flex items-center space-x-4">
                 <button
                   onClick={() => {
-                    user ? router.push('/list') : openModal();
+                    session?.user ? router.push('/create') : openModal();
                   }}
                   className="hidden sm:block hover:bg-gray-200 transition px-3 py-1 rounded-md"
                 >
